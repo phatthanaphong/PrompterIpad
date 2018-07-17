@@ -30,8 +30,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var collap = false
     var textName:String?
     var userID:Int?
-    var menuItem:[String] = ["โหมดในการแสดง promter", "รูปแบบการแสดง prompter", "แบบอักษร", "ขนาดอักษร", "ความเร็วของ prompter", "ระยะระหว่างบรรทัด","รูปแบบ pointer", "ความเร็วของ prompter"]
-    var imageName:[String] = ["computer", "circle", "social",  "text",  "gigsaw","computer", "circle", "social"]
+    //var menuItem:[String] = ["โหมดในการแสดง promter", "รูปแบบการแสดง prompter", "แบบอักษร", "ขนาดอักษร", "ความเร็วของ prompter", "ระยะระหว่างบรรทัด","รูปแบบ pointer", "ความเร็วของ prompter"]
+    //var imageName:[String] = ["computer", "circle", "social",  "text",  "gigsaw","computer", "circle", "social"]
+    
+    var menuItem:[String] = ["โหมดในการแสดง promter", "รูปแบบการแสดง prompter"]
+    var imageName:[String] = ["computer", "circle"]
+    
     var currentFileName:String?
     
     let topViewColor = UIColor(red: 0, green: 102/255, blue: 102/255, alpha: 1)
@@ -135,7 +139,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         //using spring for a nicer animation
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
             self.blackView.alpha = 1
-            self.menuTableView.frame = CGRect(x: x, y:y, width: 320, height: 406)
+            self.menuTableView.frame = CGRect(x: x, y:y, width: 320, height: 100)
         }, completion: nil)
         
         //change the background color
@@ -152,29 +156,29 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @IBAction func previewTapped(_ sender: Any) {
         self.previewButton.layer.backgroundColor = topViewColor.cgColor
-        let popOverVC = UIStoryboard(name:"Main", bundle:nil).instantiateViewController(withIdentifier: "previewPopup") as! PreviewViewController
-        self.addChildViewController(popOverVC)
-        popOverVC.previewButton = self.previewButton
-        popOverVC.view.frame = self.view.frame
-        self.view.addSubview(popOverVC.view)
-        let currentSting = self.textArea.text as String
-        //print("text name is : ",fileName)
-        //writing the file to the server
-        //try text.write(to: fileURL, atomically: false, encoding: .utf8)
-        //let text = "something"
-        //print(self.fileName as Any)
-        let fn = "\(fileName!)"
-        //do{
-            //try text.write(to:urlFile, atomically:true, encoding:.utf8)
-            //let urlstr = try String(contentsOf: url)
-            //print(currentSting)
-            self.updateText(filename: fn, text: currentSting)
-               
-        //} catch let error as Error{
-        //    print(currentSting)
-            //print("the file cannot be written: \(urlFile)")
-         //   print("erros is \(error.localizedDescription)")
-        //}
+        
+        if(self.textArea.text.isEmpty){
+            self.previewButton.layer.backgroundColor = UIColor.gray.cgColor
+            DispatchQueue.main.async(execute: {
+                self.displayMessgage(tileMsg: "cannot preview", msg: "please select texts to preview")
+            })
+
+        }
+        else{
+            let popOverVC = UIStoryboard(name:"Main", bundle:nil).instantiateViewController(withIdentifier: "previewPopup") as! PreviewViewController
+            self.addChildViewController(popOverVC)
+            popOverVC.currentText =  self.textArea.text as String
+            popOverVC.previewButton = self.previewButton
+            popOverVC.view.frame = self.view.frame
+            self.view.addSubview(popOverVC.view)
+        }
+        
+    }
+    
+    func  displayMessgage(tileMsg:String, msg:String){
+        let alert = UIAlertController(title: tileMsg, message: msg, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
         
     }
     
@@ -218,7 +222,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                                 self.performSegue(withIdentifier: "LoggedIn", sender:self)
                                 
                             })*/
-                            print("write file success")
+                            //print("write file success")
                             return
                             
                         }
@@ -257,7 +261,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell:UITableViewCell = self.menuTableView.dequeueReusableCell(withIdentifier: "menuCell") as UITableViewCell!
+        let cell:UITableViewCell = (self.menuTableView.dequeueReusableCell(withIdentifier: "menuCell") as UITableViewCell?)!
         cell.layoutMargins = UIEdgeInsets.zero
         cell.backgroundColor = UIColor.black
         cell.textLabel?.text = self.menuItem[indexPath.row]
@@ -272,6 +276,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         switch row {
         case 0:
             actionForMenuOne()
+        case 1:
+            actionForMenuTwo()
         default:
             print("select one of the menu")
         }
@@ -287,7 +293,53 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func  actionForMenuOne(){
-      print("menu one")
+
+        UIView.animate(withDuration: 0.5, animations: {
+            self.blackView.alpha = 0
+            self.menuTableView.frame = CGRect(x: 700, y:97, width: 320, height: 0)
+        })
+        
+        self.settingButton.layer.backgroundColor = UIColor.gray.cgColor
+
+        let popOverVC = UIStoryboard(name:"Main", bundle:nil).instantiateViewController(withIdentifier: "displayOption") as! DisplayOptionViewController
+        self.addChildViewController(popOverVC)
+        popOverVC.view.frame = self.view.frame
+        self.view.addSubview(popOverVC.view)
     }
+    
+    func  actionForMenuTwo(){
+        UIView.animate(withDuration: 0.5, animations: {
+            self.blackView.alpha = 0
+            self.menuTableView.frame = CGRect(x: 700, y:97, width: 320, height: 0)
+        })
+        
+        self.settingButton.layer.backgroundColor = UIColor.gray.cgColor
+        
+        let popOverVC = UIStoryboard(name:"Main", bundle:nil).instantiateViewController(withIdentifier: "playOption") as! PlayOptionViewController
+        self.addChildViewController(popOverVC)
+        popOverVC.view.frame = self.view.frame
+        self.view.addSubview(popOverVC.view)
+    }
+    
+    @IBAction func tabPlay(_ sender: Any) {
+        self.playButton.layer.backgroundColor = topViewColor.cgColor
+        
+        if(self.textArea.text.isEmpty){
+            self.playButton.layer.backgroundColor = UIColor.gray.cgColor
+            DispatchQueue.main.async(execute: {
+                self.displayMessgage(tileMsg: "cannot preview", msg: "please select texts to play")
+            })
+        }
+        else{
+            let popOverVC = UIStoryboard(name:"Main", bundle:nil).instantiateViewController(withIdentifier: "playViewController") as! PlayViewController
+            self.addChildViewController(popOverVC)
+            popOverVC.currentText =  self.textArea.text as String
+            popOverVC.playButton = self.playButton
+            popOverVC.view.frame = self.view.frame
+            self.view.addSubview(popOverVC.view)
+        }
+        
+    }
+    
     
 }

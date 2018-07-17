@@ -14,6 +14,19 @@ class Item {
     var sentence = "";
     var tag = "";
 }
+
+extension String {
+    // charAt(at:) returns a character at an integer (zero-based) position.
+    // example:
+    // let str = "hello"
+    // var second = str.charAt(at: 1)
+    //  -> "e"
+    func charAt(at: Int) -> Character {
+        let charIndex = self.index(self.startIndex, offsetBy: at)
+        return self[charIndex]
+    }
+}
+
 class TextTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
     
     @IBOutlet weak var tableView: UITableView!
@@ -62,7 +75,7 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     func retrieveDataFromSever(){
-        let url = NSURL(string:self.initURLText+":8080/iosgetText.php")
+        let url = NSURL(string:self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)+":8080/iosgetText.php")
         let request = NSMutableURLRequest(url:url! as URL)
         request.httpMethod = "POST"
         let postString = "userid=\(self.userID!)"
@@ -234,12 +247,12 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     
     func getTextFromServer(filename:String){
         self.mainObject?.fileName = filename
-        if let url = URL(string: self.initURLText+":8080/xmldata/\(filename)") {
+        if let url = URL(string: self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)+":8080/xmldata/\(filename)") {
             do {
                 let contents = try String(contentsOf: url)
-                //let outString = parseXML(xmlString: contents)
-                //textArea?.text = outString as! String
-                textArea?.text = contents
+                let xmlList = parseXML(xmlString: contents)
+                textArea?.text = xmlList
+                //textArea?.text = contents
             } catch {
                 // contents could not be loaded
             }
@@ -250,61 +263,26 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     func parseXML(xmlString:String)->String {
-        var xmlString = String()
+        var xmlList = String()
         let xml = SWXMLHash.config {
             config in
             config.shouldProcessLazily = true
             }.parse(xmlString)
-        
-       // print(xml["xml"]["text"]["data"][0]["sentence"].element?.text)
+        //print(xml["xml"]["text"]["data"][0]["sentence"].element?.text)
         for elem in xml["xml"]["text"]["data"].all {
-            xmlString = self.xmlString+"\n"
+            let s = (elem["sentence"].element?.text) as! String
+            //print(s.index(of: "[")?.encodedOffset)
+            let ind = s.index(of: "[")?.encodedOffset
+            if (ind != nil && (ind as! Int) > 0){
+                let substring = s.prefix((ind as! Int))
+                xmlList.append(substring+"\n\n")
+            }
+            else{
+                xmlList.append(s+"\n\n")
+            }
+ 
         }
-        return xmlString
-        /*
-        let xml = SWXMLHash.config {
-            config in
-            config.shouldProcessLazily = false
-            }.parse(self.xmlString);
-        
-        for elem in xml["items"]["item"] {
-            let newItem = Item();
-            var tags = [Tag]();
-            if let val = elem["author"].element?.text {
-                newItem.author = val;
-            }
-            if let val = elem["description"].element?.text {
-                newItem.desc = val;
-            }
-            for tag in elem["tag"] {
-                let tempTag = Tag();
-                if let val = tag.element?.attributes["name"] {
-                    tempTag.name = val;
-                }
-                if let val = tag.element?.attributes["count"] {
-                    if let count = Int(val) {
-                        tempTag.count = count;
-                    }
-                }
-                tags.append(tempTag);
-            }
-            newItem.tag = tags;
-            self.item.append(newItem);
-        }
-        
-        for item in self.item {
-            print("\(item.author)\n\(item.desc)");
-            for tag in item.tag {
-                if let count = tag.count {
-                    print("\(tag.name), \(count)");
-                } else {
-                    print("\(tag.name)");
-                }
-            }
-            print("\n")
-        }
-        */
+        return xmlList
+
     }
-    
-    
 }

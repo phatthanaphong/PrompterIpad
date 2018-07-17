@@ -22,7 +22,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         checkPlist()
-        // Do any additional setup after loading the view, typically from a nib.
     }
 
     override func didReceiveMemoryWarning() {
@@ -43,7 +42,9 @@ class ViewController: UIViewController {
     }
     
     func getFromJSonLogin(username:String, password:String, presentigViewController:UIViewController){
-        let url = NSURL(string:self.initURLText+":8080/ioslogin.php")
+        
+        let ctr = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)+":8080/ioslogin.php"
+        let url = NSURL(string:ctr)
         let request = NSMutableURLRequest(url:url! as URL)
         request.httpMethod = "POST"
 
@@ -121,21 +122,64 @@ class ViewController: UIViewController {
     }
     
     func checkPlist(){
+       
+        //save data to plist
+        //type of display
+        if (SwiftyPlistManager.shared.fetchValue(for: "display", fromPlistWithName: "Data") == nil){
+            SwiftyPlistManager.shared.addNew("1", key:"display" , toPlistWithName: "Data") { (err) in
+                    if err == nil {
+                        print("Value successfully added into plist.")
+                    }
+            }
+        }
+        
+        //type of play
+        if (SwiftyPlistManager.shared.fetchValue(for: "play", fromPlistWithName: "Data") == nil){
+            SwiftyPlistManager.shared.addNew("1", key:"play" , toPlistWithName: "Data") { (err) in
+                if err == nil {
+                    print("Value successfully added into plist.")
+                }
+            }
+        }
+        
+        //size
+        if (SwiftyPlistManager.shared.fetchValue(for: "size", fromPlistWithName: "Data") == nil){
+            SwiftyPlistManager.shared.addNew("36", key:"size" , toPlistWithName: "Data") { (err) in
+                if err == nil {
+                    print("Value successfully added into plist.")
+                }
+            }
+        }
+        
+        //speed
+        if (SwiftyPlistManager.shared.fetchValue(for: "speed", fromPlistWithName: "Data") == nil){
+            SwiftyPlistManager.shared.addNew("0.0", key:"speed" , toPlistWithName: "Data") { (err) in
+                if err == nil {
+                    print("Value successfully added into plist.")
+                }
+            }
+        }
+       
+        //hard code posting to the file stored ip of the server
         let url = URL(string:"http://202.28.34.202/TextPrepPilot/config.txt")!
+        
         let task = URLSession.shared.dataTask(with:url) { (data, response, error) in
             if error != nil {
                 print(error!)
+                return
             }
             else {
                 if let textFile = String(data: data!, encoding: .utf8) {
                     let text = textFile
                     let textArr = text.components(separatedBy: "\n");
-                    self.initURLText = textArr[0]
-                    self.initURLText = "http://10.10.10.117"
+                    self.initURLText =  textArr[0] as String
+                    self.initURLText = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    print(self.initURLText)
+                    //self.initURLText = "http://10.33.3.24"
                     
                 }
                 
-                guard let fetchedValue = SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data")
+                guard SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data") != nil
                     else {
                         //load the data from the server and write it to the data plist
                         //write to the plist
@@ -150,8 +194,7 @@ class ViewController: UIViewController {
                 
                 guard let initText  = SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data") else { return }
                 
-                
-                
+            
                 if(self.initURLText.compare(initText as! String).rawValue != 0){
                     
                     SwiftyPlistManager.shared.save(self.initURLText, forKey: "initURL", toPlistWithName: "Data") { (err) in

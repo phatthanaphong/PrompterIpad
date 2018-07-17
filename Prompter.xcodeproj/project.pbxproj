@@ -20,6 +20,10 @@
 		170F2A621F8C58ED00793041 /* PrompterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2A611F8C58ED00793041 /* PrompterUITests.swift */; };
 		170F2A701F8D02C000793041 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2A6F1F8D02C000793041 /* MainViewController.swift */; };
 		17E232B120F5736400E2FAA4 /* Data.plist in Resources */ = {isa = PBXBuildFile; fileRef = 17E232B020F5736400E2FAA4 /* Data.plist */; };
+		17E232B520F81DE300E2FAA4 /* MenuViewControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E232B420F81DE300E2FAA4 /* MenuViewControl.swift */; };
+		17E232B720F8351F00E2FAA4 /* PlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E232B620F8351F00E2FAA4 /* PlayViewController.swift */; };
+		17E232B920F8D36600E2FAA4 /* DisplayOptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E232B820F8D36600E2FAA4 /* DisplayOptionViewController.swift */; };
+		17E232BB20F8D3A200E2FAA4 /* PlayOptionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E232BA20F8D3A200E2FAA4 /* PlayOptionViewController.swift */; };
 		405A9F3DC2A7B0BA3DF3AE07 /* Pods_Prompter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 987F0CCDAA2703957304DD33 /* Pods_Prompter.framework */; };
 		B38A252E25F1AC0E75271273 /* Pods_PrompterUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20B039EF241223495971A628 /* Pods_PrompterUITests.framework */; };
 		D85BA22460D2693D9F5771EC /* Pods_PrompterTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3B0AFCF46509F6A870E2D00 /* Pods_PrompterTests.framework */; };
@@ -63,6 +67,10 @@
 		170F2A631F8C58ED00793041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		170F2A6F1F8D02C000793041 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		17E232B020F5736400E2FAA4 /* Data.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Data.plist; sourceTree = "<group>"; };
+		17E232B420F81DE300E2FAA4 /* MenuViewControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewControl.swift; sourceTree = "<group>"; };
+		17E232B620F8351F00E2FAA4 /* PlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayViewController.swift; sourceTree = "<group>"; };
+		17E232B820F8D36600E2FAA4 /* DisplayOptionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayOptionViewController.swift; sourceTree = "<group>"; };
+		17E232BA20F8D3A200E2FAA4 /* PlayOptionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayOptionViewController.swift; sourceTree = "<group>"; };
 		20B039EF241223495971A628 /* Pods_PrompterUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PrompterUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CEA2D97A8205AEF3246B034 /* Pods-PrompterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrompterTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PrompterTests/Pods-PrompterTests.debug.xcconfig"; sourceTree = "<group>"; };
 		8BFEF78DA511325219939A2C /* Pods-Prompter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Prompter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Prompter/Pods-Prompter.debug.xcconfig"; sourceTree = "<group>"; };
@@ -141,9 +149,12 @@
 			children = (
 				17E232B020F5736400E2FAA4 /* Data.plist */,
 				170D91A51F8E0671002443FB /* PreviewViewController.swift */,
+				17E232B620F8351F00E2FAA4 /* PlayViewController.swift */,
 				170F2A3E1F8C58ED00793041 /* AppDelegate.swift */,
 				170F2A401F8C58ED00793041 /* ViewController.swift */,
 				170F2A421F8C58ED00793041 /* Main.storyboard */,
+				17E232B820F8D36600E2FAA4 /* DisplayOptionViewController.swift */,
+				17E232BA20F8D3A200E2FAA4 /* PlayOptionViewController.swift */,
 				170D919F1F8DDF51002443FB /* TextTableViewController.swift */,
 				170F2A6F1F8D02C000793041 /* MainViewController.swift */,
 				170F2A481F8C58ED00793041 /* Assets.xcassets */,
@@ -151,6 +162,7 @@
 				170F2A4D1F8C58ED00793041 /* Info.plist */,
 				170F2A451F8C58ED00793041 /* Prompter.xcdatamodeld */,
 				170D91A71F8E5853002443FB /* SettingLauncher.swift */,
+				17E232B420F81DE300E2FAA4 /* MenuViewControl.swift */,
 			);
 			path = Prompter;
 			sourceTree = "<group>";
@@ -362,6 +374,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Prompter/Pods-Prompter-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/DLRadioButton/DLRadioButton.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 				"${BUILT_PRODUCTS_DIR}/SWXMLHash/SWXMLHash.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
@@ -370,6 +383,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DLRadioButton.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SWXMLHash.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
@@ -406,8 +420,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				170D91A81F8E5853002443FB /* SettingLauncher.swift in Sources */,
+				17E232B720F8351F00E2FAA4 /* PlayViewController.swift in Sources */,
+				17E232B520F81DE300E2FAA4 /* MenuViewControl.swift in Sources */,
 				170D91A01F8DDF51002443FB /* TextTableViewController.swift in Sources */,
+				17E232BB20F8D3A200E2FAA4 /* PlayOptionViewController.swift in Sources */,
 				170F2A471F8C58ED00793041 /* Prompter.xcdatamodeld in Sources */,
+				17E232B920F8D36600E2FAA4 /* DisplayOptionViewController.swift in Sources */,
 				170D91A61F8E0671002443FB /* PreviewViewController.swift in Sources */,
 				170F2A411F8C58ED00793041 /* ViewController.swift in Sources */,
 				170F2A3F1F8C58ED00793041 /* AppDelegate.swift in Sources */,
