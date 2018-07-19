@@ -165,6 +165,7 @@ class ViewController: UIViewController {
         
         let task = URLSession.shared.dataTask(with:url) { (data, response, error) in
             if error != nil {
+                
                 print(error!)
                 return
             }
@@ -175,7 +176,7 @@ class ViewController: UIViewController {
                     self.initURLText =  textArr[0] as String
                     self.initURLText = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)
                     print(self.initURLText)
-                    //self.initURLText = "http://10.33.3.24"
+                    //self.initURLText = "http://100.119.128.135"
                     
                 }
                 
@@ -199,7 +200,7 @@ class ViewController: UIViewController {
                     
                     SwiftyPlistManager.shared.save(self.initURLText, forKey: "initURL", toPlistWithName: "Data") { (err) in
                         if err == nil {
-                            print("Value successfully saved into plist.")
+                            print("update the url in the plist.")
                         }
                     }
                 }
@@ -208,6 +209,4 @@ class ViewController: UIViewController {
         
         task.resume()
     }
-    
-    
 }

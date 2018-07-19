@@ -43,7 +43,7 @@ class PreviewViewController: UIViewController {
         self.display = display as!String
         self.play = play as! String
         
-        self.height = 10024
+        self.height = 4024
     }
     
     override func viewDidLoad() {
@@ -114,7 +114,7 @@ class PreviewViewController: UIViewController {
                 //imageView.alpha = 1
                 //}, completion: {_ in})
                 // 20 : 4048 : 47.5
-                print(self.size)
+                //print(self.size)
                 UIView.animate(withDuration: 20, delay: 0.0, options: [.curveLinear], animations: {
                     imageView.frame = CGRect(x:0, y:-self.height, width:990, height:self.height)},
                                completion: nil)

@@ -42,6 +42,7 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     var mainObject: MainViewController?
     var initURLText = String()
     var xmlString = String()
+    var timeList = [String()]
     
     @IBOutlet weak var unrecorded: UIButton!
     @IBOutlet weak var recorded: UIButton!
@@ -61,8 +62,7 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
         self.unrecorded.layer.cornerRadius = 10
         self.recorded.layer.cornerRadius = 10
         self.all.layer.cornerRadius = 10
-        self.addButton.layer.cornerRadius = 5
-        self.deleteButton.layer.cornerRadius = 5
+  
         
         guard let loadURL = SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data") else { return }
         self.initURLText = loadURL as! String
@@ -182,13 +182,14 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
                 }
                 
                 let d = value as! NSDictionary
-                let status = d["t_status"] as! Int
-                if(status == 0){
+                //let status = Int(d["t_status"] as! String)
+                //print(d["t_status"] as! String)
+                if(d["t_status"] as! String == "0"){
                     self.titleText.append(d["t_topic"]! as! String)
                     self.detailText.append(d["t_detail"]! as! String)
-                    self.tableView.reloadData()
                 }
             }
+            self.tableView.reloadData()
             
         })
     }
@@ -204,15 +205,14 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
                 if key as! String == "error"{
                     continue
                 }
-                
                 let d = value as! NSDictionary
-                let status = d["t_status"] as! Int
-                if(status == 1){
+
+                if(d["t_status"] as! String == "1"){
                     self.titleText.append(d["t_topic"]! as! String)
                     self.detailText.append(d["t_detail"]! as! String)
-                    self.tableView.reloadData()
                 }
             }
+            self.tableView.reloadData()
             
         })
     }
@@ -251,8 +251,8 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
             do {
                 let contents = try String(contentsOf: url)
                 let xmlList = parseXML(xmlString: contents)
+                print(timeList.count)
                 textArea?.text = xmlList
-                //textArea?.text = contents
             } catch {
                 // contents could not be loaded
             }
@@ -263,6 +263,7 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     func parseXML(xmlString:String)->String {
+        self.timeList.removeAll()
         var xmlList = String()
         let xml = SWXMLHash.config {
             config in
@@ -271,18 +272,40 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
         //print(xml["xml"]["text"]["data"][0]["sentence"].element?.text)
         for elem in xml["xml"]["text"]["data"].all {
             let s = (elem["sentence"].element?.text) as! String
-            //print(s.index(of: "[")?.encodedOffset)
-            let ind = s.index(of: "[")?.encodedOffset
-            if (ind != nil && (ind as! Int) > 0){
-                let substring = s.prefix((ind as! Int))
-                xmlList.append(substring+"\n\n")
+            var st1 = ""
+            var st2 = ""
+            var flag = true
+            for c in s{
+                if(c == "["){
+                    flag = false
+                }
+                if(flag){
+                    st1.append(c)
+                }
+                else{
+                    if(c != "[" && c != "]" && String(c).isNumber){
+                        st2.append(c)
+                    }
+                }
             }
-            else{
-                xmlList.append(s+"\n\n")
-            }
- 
+            self.timeList.append(st2)
+            xmlList.append(st1+"\n\n")
         }
         return xmlList
 
     }
 }
+
+extension String {
+    var isNumber: Bool {
+        let characters = CharacterSet.decimalDigits.inverted
+        return !self.isEmpty && rangeOfCharacter(from: characters) == nil
+    }
+    
+    func isCompose(of thaiWord:String) -> Bool {
+        return self.range(of: thaiWord, options: .literal) != nil ? true : false
+    }
+}
+
+
+

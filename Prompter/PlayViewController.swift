@@ -41,7 +41,6 @@ class PlayViewController: UIViewController {
         self.view.addGestureRecognizer(gesture)
         
         showAnimate()
-        
         getSetting()
         
         if (self.display == "1"){
