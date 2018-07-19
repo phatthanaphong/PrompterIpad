@@ -43,7 +43,7 @@ class PreviewViewController: UIViewController {
         self.display = display as!String
         self.play = play as! String
         
-        self.height = 4024
+        self.height = 4000
     }
     
     override func viewDidLoad() {
@@ -67,7 +67,7 @@ class PreviewViewController: UIViewController {
        // self.play = "2"
         
         if(self.play == "1"){
-                let renderer = UIGraphicsImageRenderer(bounds: CGRect(x:0, y:-100, width:990, height: self.height))
+                let renderer = UIGraphicsImageRenderer(bounds: CGRect(x:0, y:0, width:990, height: self.height))
                 let img = renderer.image { ctx in
                     let paragraphStyle = NSMutableParagraphStyle()
                     paragraphStyle.alignment = .center
@@ -77,7 +77,7 @@ class PreviewViewController: UIViewController {
                                  NSAttributedStringKey.foregroundColor: self.textColor]
                     
                     let string = currentText
-                    string.draw(with: CGRect(x: 0, y: 300, width: 990,  height:4000), options: [.usesLineFragmentOrigin], attributes: attrs, context: nil)
+                    string.draw(with: CGRect(x: 0, y: 300, width: 990,  height:self.height+300), options: [.usesLineFragmentOrigin], attributes: attrs, context: nil)
                     
                 }
                 let imageView = UIImageView(image: img)
@@ -85,7 +85,7 @@ class PreviewViewController: UIViewController {
                 imageView.alpha = 1
                 self.view.addSubview(imageView)
                 UIView.animate(withDuration: (10-TimeInterval(self.delay))*80, delay: 2, options: [.curveLinear], animations: {
-                    imageView.frame = CGRect(x:0, y:-4000, width:990, height:4000)},
+                    imageView.frame = CGRect(x:0, y:-self.height, width:990, height:self.height)},
                 completion: nil)
                 self.view.layoutIfNeeded()
         }
