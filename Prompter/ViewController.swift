@@ -100,7 +100,7 @@ class ViewController: UIViewController {
             }
             else{
                 print("Error http status code is ",httpStatus.statusCode )
-                //flag = false
+                self.displayMessgage(tileMsg: "the connection failed", msg: "กรุณาตรวจสอบการเชื่อมต่อ")
             }
         }
  
@@ -176,7 +176,7 @@ class ViewController: UIViewController {
                     let textArr = text.components(separatedBy: "\n");
                     self.initURLText =  textArr[0] as String
                     self.initURLText = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)
-                    print(self.initURLText)
+                    //print(self.initURLText)
                     //self.initURLText = "http://10.160.72.104"
                 }
                 
