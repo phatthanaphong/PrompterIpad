@@ -43,12 +43,16 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     var initURLText = String()
     var xmlString = String()
     var timeList = [String()]
+    var textId = [String()]
+    var saveBtn:UIButton!
+    var currentTextId = String()
+    var currentXml:String?
     
     @IBOutlet weak var unrecorded: UIButton!
     @IBOutlet weak var recorded: UIButton!
     @IBOutlet weak var all: UIButton!
-    @IBOutlet weak var deleteButton: UIButton!
-    @IBOutlet weak var addButton: UIButton!
+    //@IBOutlet weak var deleteButton: UIButton!
+    //@IBOutlet weak var addButton: UIButton!
     
     
     let buttonColor = UIColor(red: 0, green: 102/255, blue: 102/255, alpha: 1)
@@ -75,6 +79,14 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     func retrieveDataFromSever(){
+        
+        self.titleText.removeAll()
+        self.detailText.removeAll()
+        self.fileNameList.removeAll()
+        self.xmlText.removeAll()
+        self.textId.removeAll()
+        //self.tableView.reloadData()
+        
         let url = NSURL(string:self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)+":8080/iosgetText.php")
         let request = NSMutableURLRequest(url:url! as URL)
         request.httpMethod = "POST"
@@ -103,15 +115,14 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
                                     }
                                     
                                     let d = value as! NSDictionary
-                                    let status = d["t_status"] as! String
-                                    if(status == "0"){
-                                        self.titleText.append(d["t_topic"]! as! String)
-                                        self.detailText.append(d["t_detail"]! as! String)
-                                        self.fileNameList.append(d["t_text"]! as! String)
-                                        self.xmlText.append(d["t_xml"]! as! String)
-                                        self.tableView.reloadData()
-                                        //print(self.fileNameList)
-                                    }
+                                    //let status = d["t_status"] as! String
+                                    //if(status == "0"){
+                                    self.titleText.append(d["t_topic"]! as! String)
+                                    self.detailText.append(d["t_detail"]! as! String)
+                                    self.fileNameList.append(d["t_text"]! as! String)
+                                    self.xmlText.append(d["t_xml"]! as! String)
+                                    self.textId.append(d["t_id"]! as! String)
+                                    self.displayUnrecored()
                                 }
                                 
                             })
@@ -169,12 +180,20 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     }
 
     @IBAction func unrecordedTapped(_ sender: Any) {
+        displayUnrecored()
+    }
+    
+    func displayUnrecored(){
+        self.saveBtn.isEnabled = true
         self.unrecorded.backgroundColor = self.buttonColor
         self.recorded.backgroundColor = UIColor.darkGray
         self.all.backgroundColor = UIColor.darkGray
         DispatchQueue.main.async(execute: {
             self.titleText.removeAll()
             self.detailText.removeAll()
+            self.fileNameList.removeAll()
+            self.xmlText.removeAll()
+            self.textId.removeAll()
             
             for (key, value) in self.textData!{
                 if key as! String == "error"{
@@ -182,24 +201,31 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
                 }
                 
                 let d = value as! NSDictionary
-                //let status = Int(d["t_status"] as! String)
-                //print(d["t_status"] as! String)
+                
                 if(d["t_status"] as! String == "0"){
                     self.titleText.append(d["t_topic"]! as! String)
                     self.detailText.append(d["t_detail"]! as! String)
+                    self.fileNameList.append(d["t_text"]! as! String)
+                    self.xmlText.append(d["t_xml"]! as! String)
+                    self.textId.append(d["t_id"]! as! String)
                 }
             }
             self.tableView.reloadData()
             
         })
     }
+    
     @IBAction func recordedTapped(_ sender: Any) {
+        self.saveBtn.isEnabled = false
         self.unrecorded.backgroundColor = UIColor.darkGray
         self.recorded.backgroundColor = self.buttonColor
         self.all.backgroundColor = UIColor.darkGray
         DispatchQueue.main.async(execute: {
             self.titleText.removeAll()
             self.detailText.removeAll()
+            self.fileNameList.removeAll()
+            self.xmlText.removeAll()
+            self.textId.removeAll()
             
             for (key, value) in self.textData!{
                 if key as! String == "error"{
@@ -210,6 +236,9 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
                 if(d["t_status"] as! String == "1"){
                     self.titleText.append(d["t_topic"]! as! String)
                     self.detailText.append(d["t_detail"]! as! String)
+                    self.fileNameList.append(d["t_text"]! as! String)
+                    self.xmlText.append(d["t_xml"]! as! String)
+                    self.textId.append(d["t_id"]! as! String)
                 }
             }
             self.tableView.reloadData()
@@ -217,12 +246,17 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
         })
     }
     @IBAction func allTapped(_ sender: Any) {
+        self.saveBtn.isEnabled = false
         self.unrecorded.backgroundColor = UIColor.darkGray
         self.recorded.backgroundColor = UIColor.darkGray
         self.all.backgroundColor = self.buttonColor
         DispatchQueue.main.async(execute: {
             self.titleText.removeAll()
             self.detailText.removeAll()
+            self.fileNameList.removeAll()
+            self.xmlText.removeAll()
+            self.textId.removeAll()
+            
             for (key, value) in self.textData!{
                 if key as! String == "error"{
                     continue
@@ -231,6 +265,9 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
                 let d = value as! NSDictionary
                 self.titleText.append(d["t_topic"]! as! String)
                 self.detailText.append(d["t_detail"]! as! String)
+                self.fileNameList.append(d["t_text"]! as! String)
+                self.xmlText.append(d["t_xml"]! as! String)
+                self.textId.append(d["t_id"]! as! String)
                 self.tableView.reloadData()
                 
             }
@@ -240,18 +277,27 @@ class TextTableViewController: UIViewController, UITableViewDataSource, UITableV
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let row = indexPath.row
-        //MainViewController. = fileNameList[row]
+
         getTextFromServer(filename: xmlText[row])
-        
+        self.currentTextId = self.textId[indexPath.row]
+        self.currentXml = self.xmlText[indexPath.row]
+        /*
+        SwiftyPlistManager.shared.save(self.textId[indexPath.row], forKey: "textID", toPlistWithName: "Data") { (err) in
+            if err == nil {
+                //print("update the url in the plist.")
+            }
+        }
+        */
     }
     
+    // tap each of item in the table list
     func getTextFromServer(filename:String){
         self.mainObject?.fileName = filename
         if let url = URL(string: self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)+":8080/xmldata/\(filename)") {
             do {
                 let contents = try String(contentsOf: url)
                 let xmlList = parseXML(xmlString: contents)
-                print(timeList.count)
+                //print(timeList.count)
                 textArea?.text = xmlList
             } catch {
                 // contents could not be loaded

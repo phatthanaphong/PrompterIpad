@@ -8,6 +8,8 @@
 
 import UIKit
 import SwiftyPlistManager
+import Alamofire
+import SwiftyJSON
 
 class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -23,6 +25,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var settingButton: UIButton!
     @IBOutlet weak var leftConstrain: NSLayoutConstraint!
     @IBOutlet weak var rightConstrain: NSLayoutConstraint!
+    @IBOutlet weak var saveButton: UIButton!
     
     var menuTableView: UITableView!
     
@@ -30,6 +33,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var collap = false
     var textName:String?
     var userID:Int?
+    var initURLText = String()
+    var recieverVCofText = TextTableViewController()
+    var saveFlag:Bool?
     //var menuItem:[String] = ["โหมดในการแสดง promter", "รูปแบบการแสดง prompter", "แบบอักษร", "ขนาดอักษร", "ความเร็วของ prompter", "ระยะระหว่างบรรทัด","รูปแบบ pointer", "ความเร็วของ prompter"]
     //var imageName:[String] = ["computer", "circle", "social",  "text",  "gigsaw","computer", "circle", "social"]
     
@@ -39,6 +45,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var currentFileName:String?
     
     let topViewColor = UIColor(red: 0, green: 102/255, blue: 102/255, alpha: 1)
+    let buttonColor = UIColor(red: 0, green: 102/255, blue: 102/255, alpha: 1)
     
     override func viewDidLoad() {
         
@@ -46,17 +53,23 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.nameLabel.text = text
         }
         super.viewDidLoad()
+        
+        guard let loadURL = SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data") else { return }
+        self.initURLText = loadURL as! String
+        
         self.leftView.layer.borderWidth = 1;
         self.leftView.layer.borderColor = UIColor.lightGray.cgColor
         self.collapseButton.layer.backgroundColor = UIColor.gray.cgColor
         self.settingButton.layer.backgroundColor = UIColor.gray.cgColor
         self.playButton.layer.backgroundColor = UIColor.gray.cgColor
         self.previewButton.layer.backgroundColor = UIColor.gray.cgColor
+        self.saveButton.layer.backgroundColor = UIColor.gray.cgColor
         self.topView.layer.backgroundColor = self.topViewColor.cgColor
         self.settingButton.layer.cornerRadius = 10;
         self.collapseButton.layer.cornerRadius = 10;
         self.playButton.layer.cornerRadius = 10;
         self.previewButton.layer.cornerRadius = 10;
+        self.saveButton.layer.cornerRadius = 10;
         self.topView.layer.backgroundColor = self.topViewColor.cgColor
         createMenuTableView()
     }
@@ -87,8 +100,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         UIView.animate(withDuration: 0.5, animations: {
             self.leftConstrain.constant = self.collap ? 0 : -self.leftView.frame.size.width
             self.rightConstrain.constant = self.collap ? 0 : self.leftView.frame.size.width
-            //self.menuConstrain.constant = self.collap ? 1024 : 784
-            //print(self.menuConstrain.constant)
+
             self.view.layoutIfNeeded()
         }){ (success) in
             self.collap = self.collap ? false:true
@@ -109,10 +121,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "viewTextData"{
-            let recieverVC = segue.destination as! TextTableViewController
-            recieverVC.userID = self.userID
-            recieverVC.textArea = self.textArea
-            recieverVC.mainObject = self  // referencing file name of text between the views
+            recieverVCofText = segue.destination as! TextTableViewController
+            recieverVCofText.userID = self.userID
+            recieverVCofText.textArea = self.textArea
+            recieverVCofText.saveBtn = self.saveButton
+            recieverVCofText.mainObject = self  // referencing file name of text between the views
         }
     }
  
@@ -178,7 +191,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func  displayMessgage(tileMsg:String, msg:String){
         let alert = UIAlertController(title: tileMsg, message: msg, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: {
+            if(self.saveFlag == true){
+                self.saveButton.layer.backgroundColor = UIColor.gray.cgColor
+                self.saveFlag = false;
+            }
+        })
         
     }
     
@@ -189,76 +207,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         return self.menuItem.count
     }
     
-    func updateText(filename: String, text:String)->Bool{
-        let url = NSURL(string:"http://202.28.34.202/textpreppilot/web/api/updateText.php")
-        let request = NSMutableURLRequest(url:url! as URL)
-        request.httpMethod = "POST"
-        
-        let postString = "filename=\(filename)&text=\(text)"
-        print(postString)
-        request.httpBody = postString.data(using: String.Encoding.utf8)
-        let task =  URLSession.shared.dataTask(with: request as URLRequest) {data,response,error in
-            guard error == nil && data != nil else{
-                //self.displayMessgage(tileMsg: "Conection Failed", msg: "Cannot connect to the server, please check your connection")
-                //print("it works");
-                return
-        }
-        let httpStatus = response as! HTTPURLResponse
-            //self.displayMessgage(tileMsg: "Login Failed", msg: "Either Username or Password is empty")
-        if httpStatus.statusCode == 200 {
-                if data!.count != 0{
-                    do{
-                        let responseString = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! NSDictionary
-                        let errorFlag = responseString["error"] as! Bool
-                        
-                        if errorFlag == false{
-                            //let user = responseString["user"] as! NSDictionary
-                            /*
-                            DispatchQueue.main.async(execute: {
-                                self.username.text = ""
-                                self.password.text = ""
-                                self.userName = "\(user["name"]!)"//"  \(user["lastname"]!)"
-                                self.userID = (user["id"]! as! NSString).integerValue
-                                self.performSegue(withIdentifier: "LoggedIn", sender:self)
-                                
-                            })*/
-                            //print("write file success")
-                            return
-                            
-                        }
-                        else{
-                            print(responseString["message"] as! String)
-                            /*
-                            DispatchQueue.main.async(execute: {
-                              
-                                self.displayMessgage(tileMsg: "Login Failed", msg: "Invalid Username or Password")
-                            })
-                            */
-                        }
-                        
-                    }
-                    catch _ as NSError{
-                        print("Error cannnot get response from the server")
-                        //flag = false
-                    }
-                }
-                else{
-                    print("No data retrived from the sever")
-                    //flag = false
-                    
-                }
-        }
-        else{
-                print("Error http status code is ",httpStatus.statusCode )
-                //flag = false
-                return
-            }
-        }
-        
-        task.resume()
-        
-        return true
-    }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell:UITableViewCell = (self.menuTableView.dequeueReusableCell(withIdentifier: "menuCell") as UITableViewCell?)!
@@ -322,6 +270,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @IBAction func tabPlay(_ sender: Any) {
+        //
+        // this function is performed when tapping play
+        //
         self.playButton.layer.backgroundColor = topViewColor.cgColor
         
         if(self.textArea.text.isEmpty){
@@ -341,5 +292,91 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
     }
     
+
+    @IBAction func doUpdate(_ sender: Any) {
+        if(recieverVCofText.textArea?.text == ""){
+            displayMessgage(tileMsg: "Warning", msg: "กรุณาเลือกข้อความ")
+        }else{
+            self.saveFlag = true
+            self.saveButton.layer.backgroundColor = topViewColor.cgColor
+            upDateStatus(textID: recieverVCofText.currentTextId, xmlfile: recieverVCofText.currentXml!)
+            
+        }
+    }
     
+    
+    func upDateStatus(textID:String, xmlfile:String){
+        let sv = UIViewController.displaySpinner(onView: self.view)
+        let urlConvert = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)+":9003/convertJson"
+        let h = self.initURLText.substring(from: 7, to: self.initURLText.count)
+        Alamofire.request(urlConvert, method: .post, parameters: ["id":textID, "xmlfile":xmlfile, "host":h],encoding: JSONEncoding.default, headers: nil).responseJSON {
+            response in
+            switch response.result {
+            case .success:
+                print(response)
+                guard let json = response.result.value as? [String: Any] else {
+                    print("didn't get todo object as JSON from API")
+                    if let error = response.result.error {
+                        print("Error: \(error)")
+                    }
+                    return
+                }
+                
+                guard let ans = json["ans"] as? String else {
+                    print("Could not get time from JSON")
+                    return
+                }
+                print(ans)
+                self.recieverVCofText.textArea?.text = "";
+                self.displayMessgage(tileMsg: "บันทึกวีดีโอ", msg: "ทำการบันทึกวีดีโอเรียบร้อยแล้ว")
+                self.recieverVCofText.retrieveDataFromSever();
+                self.recieverVCofText.tableView.reloadData()
+                UIViewController.removeSpinner(spinner: sv)
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+ 
 }
+
+//
+// class extension 
+//
+extension String {
+    func substring(from: Int, to: Int) -> String {
+        let start = index(startIndex, offsetBy: from)
+        let end = index(start, offsetBy: to - from)
+        return String(self[start ..< end])
+    }
+    
+    func substring(range: NSRange) -> String {
+        return substring(from: range.lowerBound, to: range.upperBound)
+    }
+}
+
+extension UIViewController {
+    class func displaySpinner(onView : UIView) -> UIView {
+        let spinnerView = UIView.init(frame: onView.bounds)
+        spinnerView.backgroundColor = UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
+        let ai = UIActivityIndicatorView.init(activityIndicatorStyle: .whiteLarge)
+        ai.startAnimating()
+        ai.center = spinnerView.center
+        
+        DispatchQueue.main.async {
+            spinnerView.addSubview(ai)
+            onView.addSubview(spinnerView)
+        }
+        
+        return spinnerView
+    }
+    
+    class func removeSpinner(spinner :UIView) {
+        DispatchQueue.main.async {
+            spinner.removeFromSuperview()
+        }
+    }
+}
+
+

@@ -128,7 +128,7 @@ class ViewController: UIViewController {
         if (SwiftyPlistManager.shared.fetchValue(for: "display", fromPlistWithName: "Data") == nil){
             SwiftyPlistManager.shared.addNew("1", key:"display" , toPlistWithName: "Data") { (err) in
                     if err == nil {
-                        print("Value successfully added into plist.")
+                        //print("Value successfully added into plist.")
                     }
             }
         }
@@ -137,7 +137,7 @@ class ViewController: UIViewController {
         if (SwiftyPlistManager.shared.fetchValue(for: "play", fromPlistWithName: "Data") == nil){
             SwiftyPlistManager.shared.addNew("1", key:"play" , toPlistWithName: "Data") { (err) in
                 if err == nil {
-                    print("Value successfully added into plist.")
+                    //print("Value successfully added into plist.")
                 }
             }
         }
@@ -146,7 +146,7 @@ class ViewController: UIViewController {
         if (SwiftyPlistManager.shared.fetchValue(for: "size", fromPlistWithName: "Data") == nil){
             SwiftyPlistManager.shared.addNew("36", key:"size" , toPlistWithName: "Data") { (err) in
                 if err == nil {
-                    print("Value successfully added into plist.")
+                    //print("Value successfully added into plist.")
                 }
             }
         }
@@ -155,12 +155,13 @@ class ViewController: UIViewController {
         if (SwiftyPlistManager.shared.fetchValue(for: "speed", fromPlistWithName: "Data") == nil){
             SwiftyPlistManager.shared.addNew("0.0", key:"speed" , toPlistWithName: "Data") { (err) in
                 if err == nil {
-                    print("Value successfully added into plist.")
+                    //print("Value successfully added into plist.")
                 }
             }
         }
+        
        
-        //hard code posting to the file stored ip of the server
+        //hardcode posting to the file stored ip of the server
         let url = URL(string:"http://202.28.34.202/TextPrepPilot/config.txt")!
         
         let task = URLSession.shared.dataTask(with:url) { (data, response, error) in
@@ -176,8 +177,7 @@ class ViewController: UIViewController {
                     self.initURLText =  textArr[0] as String
                     self.initURLText = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)
                     print(self.initURLText)
-                    //self.initURLText = "http://100.119.128.135"
-                    
+                    self.initURLText = "http://10.160.72.104"
                 }
                 
                 guard SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data") != nil
@@ -200,7 +200,7 @@ class ViewController: UIViewController {
                     
                     SwiftyPlistManager.shared.save(self.initURLText, forKey: "initURL", toPlistWithName: "Data") { (err) in
                         if err == nil {
-                            print("update the url in the plist.")
+                            //print("update the url in the plist.")
                         }
                     }
                 }
