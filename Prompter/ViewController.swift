@@ -177,7 +177,7 @@ class ViewController: UIViewController {
                     self.initURLText =  textArr[0] as String
                     self.initURLText = self.initURLText.trimmingCharacters(in: .whitespacesAndNewlines)
                     print(self.initURLText)
-                    self.initURLText = "http://10.160.72.104"
+                    //self.initURLText = "http://10.160.72.104"
                 }
                 
                 guard SwiftyPlistManager.shared.fetchValue(for: "initURL", fromPlistWithName: "Data") != nil
